@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}{{ topic.title }}{% endblock title %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1>Ninja Tech Forum</h1>
+    <p>Welcome to Ninja Tech Forum - the best forum for teach fans. Comin soon!</p>
+</div>
+<div>
+    <h1>List of topics details</h1>
+    <!-- TOPIC -->
+    <div class="col-xs-12 col-md-10">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <span class="pull-left">User email: {{ topic.author_email }}, Time created: {{ topic.created }}</span>
+                <span class="pull-right">
+                    <button type="submit" class="btn btn-xs btn-default">Edit</button>
+                    {% if user  %}
+                        {% if topic.author_email == user.email() or user.admin  %}
+                        <form action="/topic/{{topic.key.id()}}/delete" method="post">
+                            <input type="hidden" name="csrf_token" value="{{csrf_token}}">
+                            <button class="btn btn-xs btn-dange">Delete topic</button>
+                        </form>
+                        {% endif  %}
+                    {% endif  %}
+                    <button type="submit" class="btn btn-xs btn-success">Subscribe</button>
+                </span>>
+            </div>
+            <div class="panel-body">
+                <ul>
+                    <li>Topic name:{{ topic.title }}, Topic ID:{{ topic.key.id() }}, Content: {{ topic.content}}, Author email:{{ topic.author_email }}, Topic created: {{ topic.created }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- END TOPIC -->
+
+
+    <!-- COMMENTS -->
+{% for comment in comments %}
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ comment.author_email }} on {{ comment.created.strftime("%d.%m.%Y at %H:%M") }}</h3>
+                {% if user  %}
+                    {% if comment.author_email == user.email() or user.admin  %}
+                    <form action="/comment/{{comment.key.id()}}/delete" method="post">
+                        <input type="hidden" name="csrf_token" value="{{csrf_token}}">
+                        <button class="btn btn-xs btn-danger">Delete comment</button>
+                    </form>
+                    {% endif  %}
+                {% endif  %}
+            </div>
+
+            <div class="panel-body">
+                <p>{{ comment.content }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<!-- END COMMENTS -->
+<!-- ADD COMMENT -->
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">Add new comment</h3>
+            </div>
+
+            <div class="panel-body">
+                <form action="/topic/{{topic.key.id()}}/comment/add" method="post">
+                    <input type="hidden" name="csrf_token" value="{{csrf_token}}">
+
+                    <div class="form-group">
+                        <textarea name="comment-text" class="form-control" rows="6" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Submit comment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> <!-- END ADD COMMENT -->
+{% endblock content %}
